@@ -1,0 +1,27 @@
+{
+  "name": "meteo-realtime",
+  "version": "1.0.0",
+  "description": "Real-time weather project using Node.js, WebSocket and CSV",
+  "main": "app1.js",
+  "scripts": {
+    "start": "node app1.js",
+    "dev": "nodemon app1.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "websocket",
+    "csv",
+    "realtime"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "csvtojson": "^2.0.14",
+    "ws": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

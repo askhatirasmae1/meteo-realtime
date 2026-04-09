@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Météo Realtime Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background: #f4f6f9;
+}
+
+.container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* TABLE */
+.table-box {
+  flex: 1;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #f1f1f1;
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+/* CHARTS */
+.chart-box {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+canvas {
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- TABLE -->
+  <div class="table-box">
+    <h3>Données météo</h3>
+    <table id="table">
+      <thead>
+        <tr>
+          <th>Mois</th>
+          <th>Max/Min</th>
+          <th>Pluie</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="chart-box">
+    <canvas id="chartTemp"></canvas>
+    <canvas id="chartRain"></canvas>
+  </div>
+
+</div>
+
+<script>
+const months = [];
+const max = [];
+const min = [];
+const rain = [];
+
+// Charts
+const ctx1 = document.getElementById("chartTemp").getContext("2d");
+const tempChart = new Chart(ctx1, {
+  type: "line",
+  data: {
+    labels: months,
+    datasets: [
+      { label: "Max", data: max, borderColor: "red", fill: false },
+      { label: "Min", data: min, borderColor: "blue", fill: false }
+    ]
+  }
+});
+
+const ctx2 = document.getElementById("chartRain").getContext("2d");
+const rainChart = new Chart(ctx2, {
+  type: "bar",
+  data: {
+    labels: months,
+    datasets: [
+      { label: "Pluie", data: rain, backgroundColor: "skyblue" }
+    ]
+  }
+});
+
+// WebSocket
+const ws = new WebSocket("ws://localhost:5002");
+
+ws.onmessage = (event) => {
+  const d = JSON.parse(event.data);
+
+  months.push(d.mois);
+  max.push(+d.tmax);
+  min.push(+d.tmin);
+  rain.push(+d.pluie);
+
+  // table
+  document.querySelector("#table tbody").innerHTML += `
+    <tr>
+      <td>${d.mois}</td>
+      <td>${d.tmax}° / ${d.tmin}°</td>
+      <td>${d.pluie}</td>
+    </tr>
+  `;
+
+  tempChart.update();
+  rainChart.update();
+};
+</script>
+
+</body>
+</html>
